@@ -1,14 +1,20 @@
 {
   "name": "nomadcoders.zoom-clone",
   "version": "1.0.0",
-  "description": "Zoom clone using WebRTC and Web",
+  "description": "Zoom clone using WebRTC and Websocket",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "WebRTC",
+    "WebSocket",
+    "Node.js",
+    "Express",
+    "Pug"
+  ],
+  "author": "안승례",
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.24.8",
@@ -19,6 +25,7 @@
   },
   "dependencies": {
     "express": "^4.19.2",
-    "pug": "^3.0.3"
+    "pug": "^3.0.3",
+    "ws": "^8.18.0"
   }
 }
