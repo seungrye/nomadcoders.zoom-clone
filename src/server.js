@@ -26,11 +26,14 @@ const handleListen = () => console.log("Listening on http://localhost:3000");
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
+const sockets = [];
+
 wss.on("connection", (socket) => {
-  socket.send("Connected to browser");
+  console.log("Connected to browser");
+  sockets.push(socket);
   socket.onclose = () => console.log("disconnected from the browser");
   socket.onmessage = (message) => {
-    socket.send(message.data);
+    sockets.forEach(sock => sock.send(message.data));
   };
 });
 

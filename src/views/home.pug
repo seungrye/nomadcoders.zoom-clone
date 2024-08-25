@@ -8,10 +8,13 @@ html(lang="en")
     link(rel="stylesheet", href="https://unpkg.com/mvp.css")
   body
     header
-      h1 It workds
+      h1 NodeZoom
     main
+      form#nickname
+        input(type="text", placeholder="choose a nick name", required)
+        button Save
       ul
-      form
+      form#message
         input(type="text", placeholder="write a msg", required)
         button Send
     script(src="/public/js/app.js")
