@@ -33,5 +33,10 @@ messageForm.onsubmit = (event) => {
   event.preventDefault();
   const input = messageForm.querySelector("input");
   websocket.send(makeMessage("new_message", input.value));
+
+  const li = document.createElement("li");
+  li.innerText = `You : ${input.value}`;
+  messageList.append(li);
+
   input.value = "";
 }
