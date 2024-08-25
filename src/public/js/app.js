@@ -13,7 +13,7 @@ websocket.onopen = () => {
 };
 
 websocket.onmessage = (message) => {
-  console.log("message from server : ", message.data);
+  console.log(message.data);
   const li = document.createElement("li");
   li.innerText = message.data;
   messageList.append(li);
@@ -26,13 +26,12 @@ websocket.onclose = () => {
 nicknameForm.onsubmit = (event) => {
   event.preventDefault();
   const input = nicknameForm.querySelector("input");
-  websocket.send(makeMessage("nickname", input.type));
-  input.value = "";
+  websocket.send(makeMessage("nickname", input.value));
 }
 
 messageForm.onsubmit = (event) => {
   event.preventDefault();
   const input = messageForm.querySelector("input");
-  websocket.send(input.value);
+  websocket.send(makeMessage("new_message", input.value));
   input.value = "";
 }
