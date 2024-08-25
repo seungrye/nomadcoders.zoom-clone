@@ -5,9 +5,13 @@ websocket.onopen = () => {
 };
 
 websocket.onmessage = (message) => {
-  console.log(message.data);
+  console.log("message from server : ", message.data);
 };
 
 websocket.onclose = () => {
   console.log("disconnected");
 }
+
+setTimeout(() => {
+  websocket.send("send from browser");
+}, 1000);
