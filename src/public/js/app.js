@@ -1,3 +1,5 @@
+const messageList = document.querySelector("ul")
+const messageForm = document.querySelector("form")
 const websocket = new WebSocket(`ws://${window.location.host}`);
 
 websocket.onopen = () => {
@@ -12,6 +14,9 @@ websocket.onclose = () => {
   console.log("disconnected");
 }
 
-setTimeout(() => {
-  websocket.send("send from browser");
-}, 1000);
+messageForm.onsubmit = (event) => {
+  event.preventDefault();
+  const input = messageForm.querySelector("input");
+  websocket.send(input.value);
+  input.value = "";
+}

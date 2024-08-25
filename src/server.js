@@ -27,10 +27,11 @@ const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
 wss.on("connection", (socket) => {
-  socket.send("hello WebSocket")
+  socket.send("Connected to browser");
   socket.onclose = () => console.log("disconnected from the browser");
-  socket.onmessage = (message) => console.log("message from browser : ", message.data);
-  console.log(socket);
+  socket.onmessage = (message) => {
+    socket.send(message.data);
+  };
 });
 
 server.listen(3000, handleListen);
