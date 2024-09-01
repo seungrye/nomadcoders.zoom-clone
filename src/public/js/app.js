@@ -3,6 +3,15 @@ const socket = io();
 /// socket event handler
 socket.on("welcome", async () => {
   console.log("someone joined");
+
+  myDataChannel = myPeerConnection.createDataChannel("chat")
+  myDataChannel.onopen = (_event) => {
+    myDataChannel.send("hi~");
+  }
+  myDataChannel.onmessage = (event) => {
+    console.log(event.data)
+  }
+
   const offer = await myPeerConnection.createOffer();
   myPeerConnection.setLocalDescription(offer);
   console.log("send offer");
@@ -11,6 +20,18 @@ socket.on("welcome", async () => {
 
 socket.on("offer", async offer => {
   console.log("recv offer");
+
+  myPeerConnection.ondatachannel = (event) => {
+    myDataChannel = event.channel
+
+    myDataChannel.onopen = (_event) => {
+      myDataChannel.send("hello~");
+    }
+    myDataChannel.onmessage = (event) => {
+      console.log(event.data)
+    }
+  }
+
   myPeerConnection.setRemoteDescription(offer);
   const answer = await myPeerConnection.createAnswer()
   myPeerConnection.setLocalDescription(answer);
@@ -69,9 +90,9 @@ const makeConnection = () => {
   }
   myPeerConnection.ontrack = (data) => {
     const stream = data.streams[0];
-    console.log("got stream from peer");
-    console.log("peer stream : ", stream);
-    console.log(" my  stream : ", myStream)
+    // console.log("got stream from peer");
+    // console.log("peer stream : ", stream);
+    // console.log(" my  stream : ", myStream)
 
     const peerFace = document.getElementById("peerFace");
     peerFace.srcObject = stream;
@@ -92,6 +113,7 @@ let cameraOff = false;
 let roomName;
 /** @type {RTCPeerConnection} */
 let myPeerConnection;
+let myDataChannel;
 
 call.hidden = true;
 
