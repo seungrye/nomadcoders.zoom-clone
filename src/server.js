@@ -1,7 +1,7 @@
 import express from "express"
 import http from "http"
-import SocketIO from "socket.io"
-
+import { Server } from "socket.io"
+import {instrument} from "@socket.io/admin-ui";
 const app = express()
 
 app.set("view engine", "pug")
@@ -24,21 +24,53 @@ app.get("/*", (
 
 const handleListen = () => console.log("Listening on http://localhost:3000");
 const httpServer = http.createServer(app)
-const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true
+  }
+});
+
+instrument(wsServer, {
+  auth: false
+})
+
+const publicRooms = () => {
+  const {sockets: {adapter: { sids,rooms}}} = wsServer;
+
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    sids.get(key) == undefined && publicRooms.push(key);
+  })
+  return publicRooms;
+}
+
+const countRoom = (roomName) => {
+  return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 wsServer.on("connection", (socket) => {
   socket['nickname'] = "Anonymous";
 
-  socket.onAny(e => console.log("socket event : ", e));
+  socket.onAny(e => {
+    console.log(wsServer.sockets.adapter);
+    console.log("socket event : ", e);
+});
 
   socket.on("enter-room", ({ payload: room }, done) => {
     socket.join(room);
     console.log(socket.rooms)
     done();
-    socket.to(room).emit("hello", socket.nickname);
+    socket.to(room).emit("hello", socket.nickname, countRoom(room));
+    wsServer.sockets.emit("room-change", publicRooms());
   })
 
   socket.on("disconnecting", () => {
-    socket.rooms.forEach(room => socket.to(room).emit("bye", socket.nickname));
+    socket.rooms.forEach(room => socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1));
+  })
+
+  socket.on("disconnect", () => {
+    wsServer.sockets.emit("room-change", publicRooms());
   })
 
   socket.on("nickname", ({ payload: nickname }) => {
