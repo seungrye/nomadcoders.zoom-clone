@@ -53,6 +53,10 @@ wsServer.on("connection", (socket) => {
   socket.on("ice", (ice, roomName) => {
     socket.to(roomName).emit("ice", ice);
   })
+
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach(roomName => socket.to(roomName).emit("bye"));
+  });
 })
 
 httpServer.listen(3000, handleListen);

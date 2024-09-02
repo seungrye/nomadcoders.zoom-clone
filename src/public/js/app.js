@@ -1,6 +1,6 @@
 const socket = io();
 
-/// socket event handler
+/// socket event handler //////////////////////////////////////////////////////
 socket.on("welcome", async () => {
   console.log("someone joined");
 
@@ -10,6 +10,10 @@ socket.on("welcome", async () => {
   }
   myDataChannel.onmessage = (event) => {
     console.log(event.data)
+
+    const li = document.createElement("li");
+    li.innerText = event.data;
+    chat.appendChild(li)
   }
 
   const offer = await myPeerConnection.createOffer();
@@ -29,6 +33,10 @@ socket.on("offer", async offer => {
     }
     myDataChannel.onmessage = (event) => {
       console.log(event.data)
+
+      const li = document.createElement("li");
+      li.innerText = event.data;
+      chat.appendChild(li)
     }
   }
 
@@ -48,7 +56,17 @@ socket.on("ice", async ice => {
   console.log("recv ice")
   myPeerConnection.addIceCandidate(ice);
 });
-/// welcome
+
+socket.on("bye", () => {
+  console.log("recv bye")
+  myPeerConnection.close();
+  myDataChannel.close();
+
+  // wait new peer stream again stream
+  makeConnection();
+});
+
+/// welcome ///////////////////////////////////////////////////////////////////
 const welcome = document.getElementById("welcome");
 const call = document.getElementById("call");
 
@@ -101,11 +119,13 @@ const makeConnection = () => {
 }
 
 
-/// call
+/// call //////////////////////////////////////////////////////////////////////
 const myFace = document.getElementById("myFace");
 const muteBtn = document.getElementById("mute");
 const cameraBtn = document.getElementById("camera");
 const cameraSelect = document.getElementById("cameras")
+const chat = document.getElementById("chat");
+const chatForm = chat.querySelector("form");
 
 let myStream;
 let muted = false;
@@ -201,3 +221,17 @@ cameraSelect.onchange = async (event) => {
     await videoSender.replaceTrack(videoTrack);
   }
 }
+
+chatForm.onsubmit = async (event) => {
+  event.preventDefault();
+  const input = chatForm.querySelector("input");
+  myDataChannel.send(input.value);
+
+  const li = document.createElement("li");
+  li.innerText = input.value;
+  chat.appendChild(li)
+
+  input.value = "";
+}
+
+
